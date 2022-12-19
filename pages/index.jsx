@@ -1,21 +1,26 @@
+//pages/index.jsx
 
-import { useFsFlag, useFlagship, Flagship, HitType } from '@flagship.io/react-sdk'
-import styles from '../styles/Home.module.css'
+import {
+  useFsFlag,
+  useFlagship,
+  Flagship,
+  HitType,
+  EventCategory,
+} from "@flagship.io/react-sdk";
+import styles from "../styles/Home.module.css";
 
 export default function Home() {
-
   const fs = useFlagship();
 
-  //get flag 
+  //get flag
   const myFlag = useFsFlag("my_flag_key", "default-value");
 
   const onSendHitClick = () => {
-    fs.hit.send(
-      {
-        type: HitType.PAGE_VIEW,
-        documentLocation: "abtastylab"
-      },
-    );
+    fs.hit.send({
+      type: HitType.EVENT,
+      category: EventCategory.ACTION_TRACKING,
+      action: "click button",
+    });
   };
 
   return (
@@ -34,15 +39,19 @@ export default function Home() {
         </button>
       </main>
     </div>
-  )
+  );
 }
 
-// This function runs only on the server side
+// This function runs only at build time
 export async function getStaticProps() {
   //Start the Flagship SDK
-  const flagship = Flagship.start(process.env.NEXT_PUBLIC_ENV_ID, process.env.NEXT_PUBLIC_API_KEY, {
-    fetchNow: false,
-  });
+  const flagship = Flagship.start(
+    process.env.NEXT_PUBLIC_ENV_ID,
+    process.env.NEXT_PUBLIC_API_KEY,
+    {
+      fetchNow: false,
+    }
+  );
 
   const initialVisitorData = {
     id: "my_visitor_id",
@@ -63,8 +72,8 @@ export async function getStaticProps() {
   // Pass data to the page via props
   return {
     props: {
-      initialFlagsData: visitor.getFlagsDataArray(),
+      flagsData: visitor.getFlagsDataArray(),
       initialVisitorData,
-    }
-  }
+    },
+  };
 }
