@@ -13,10 +13,10 @@ export default function Home() {
   const fs = useFlagship();
 
   //get flag
-  const myFlag = useFsFlag("my_flag_key", "default-value");
+  const myFlag = useFsFlag("my_flag_key");
 
   const onSendHitClick = () => {
-    fs.hit.send({
+    fs.sendHits({
       type: HitType.EVENT,
       category: EventCategory.ACTION_TRACKING,
       action: "click button",
@@ -28,7 +28,7 @@ export default function Home() {
       <main className={styles.main}>
         <h1>Next Static site generation integration with Flagship [SSG]</h1>
         <p>flag key: my_flag_key</p>
-        <p>flag value: {myFlag.getValue()}</p>
+        <p>flag value: {myFlag.getValue("default-value")}</p>
         <button
           style={{ width: 100, height: 50 }}
           onClick={() => {
@@ -45,7 +45,7 @@ export default function Home() {
 // This function runs only at build time
 export async function getStaticProps() {
   //Start the Flagship SDK
-  const flagship = Flagship.start(
+  const flagship = await Flagship.start(
     process.env.NEXT_PUBLIC_ENV_ID,
     process.env.NEXT_PUBLIC_API_KEY,
     {
@@ -64,6 +64,7 @@ export async function getStaticProps() {
   const visitor = flagship.newVisitor({
     visitorId: initialVisitorData.id,
     context: initialVisitorData.context,
+    hasConsented: true,
   });
 
   // //Fetch flags
@@ -72,7 +73,7 @@ export async function getStaticProps() {
   // Pass data to the page via props
   return {
     props: {
-      flagsData: visitor.getFlagsDataArray(),
+      initialFlagsData: visitor.getFlags().toJSON(),
       initialVisitorData,
     },
   };
